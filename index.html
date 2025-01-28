@@ -1,1 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #282c34;
+      color: white;
+    }
+    canvas {
+      border: 3px solid white;
+      background-color: black;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: white;
+      border: 2px solid blue;
+      color: blue;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:active {
+      background-color: lightgray;
+    }
+    .status {
+      margin: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="300" height="300"></canvas>
+  <div class="status" id="status">Score: 0</div>
+  <button id="withdraw">Withdraw Money</button>
+  <button id="pause">Pause</button>
 
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+    const withdrawButton = document.getElementById("withdraw");
+    const pauseButton = document.getElementById("pause");
+    const statusDisplay = document.getElementById("status");
+
+    let snake = [{ x: 150, y: 150 }];
+    let direction = { x: 20, y: 0 };
+    let food = { x: 100, y: 100 };
+    let score = 0;
+    let isPaused = false;
+
+    function drawGame() {
+      if (isPaused) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Snake
+      ctx.fillStyle = "lime";
+      snake.forEach(segment => {
+        ctx.fillRect(segment.x, segment.y, 20, 20);
+      });
+
+      // Draw Food
+      ctx.fillStyle = "red";
+      ctx.fillRect(food.x, food.y, 20, 20);
+
+      // Update status
+      statusDisplay.textContent = `Score: ${score}`;
+    }
+
+    function moveSnake() {
+      if (isPaused) return;
+
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        food = { x: Math.floor(Math.random() * 15) * 20, y: Math.floor(Math.random() * 15) * 20 };
+      } else {
+        snake.pop();
+      }
+
+      snake.unshift(head);
+      drawGame();
+    }
+
+    function gameLoop() {
+      setInterval(() => {
+        if (!isPaused) moveSnake();
+      }, 200);
+    }
+
+    // Event Listeners
+    document.addEventListener("keydown", event => {
+      switch (event.key) {
+        case "ArrowUp":
+          if (direction.y === 0) direction = { x: 0, y: -20 };
+          break;
+        case "ArrowDown":
+          if (direction.y === 0) direction = { x: 0, y: 20 };
+          break;
+        case "ArrowLeft":
+          if (direction.x === 0) direction = { x: -20, y: 0 };
+          break;
+        case "ArrowRight":
+          if (direction.x === 0) direction = { x: 20, y: 0 };
+          break;
+      }
+    });
+
+    pauseButton.addEventListener("click", () => {
+      isPaused = !isPaused;
+      pauseButton.textContent = isPaused ? "Resume" : "Pause";
+    });
+
+    withdrawButton.addEventListener("click", () => {
+      isPaused = true;
+      window.location.href = "withdraw.html";
+    });
+
+    drawGame();
+    gameLoop();
+  </script>
+</body>
+</html>
