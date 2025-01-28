@@ -224,8 +224,8 @@
 
       // Show Start button again after restarting the game
       startBtn.style.display = "block";
-      pauseBtn.style.display = "block";
-      withdrawBtn.style.display = "block";
+      pauseBtn.style.display = "none";
+      withdrawBtn.style.display = "none";
     }
 
     function startGame() {
@@ -246,4 +246,12 @@
     buttons.left.addEventListener("click", () => {
       if (direction.x === 0) direction = { x: -gridSize, y: 0 };
     });
-    buttons.right.addEventListener("click", ()
+    buttons.right.addEventListener("click", () => {
+      if (direction.x === 0) direction = { x: gridSize, y: 0 };
+    });
+    pauseBtn.addEventListener("click", () => {
+      isPaused = !isPaused;
+      pauseBtn.textContent = isPaused ? "Resume" : "Pause";
+    });
+    withdrawBtn.addEventListener("click", () => {
+      alert(`You have withdrawn ${totalEarnings}$$
