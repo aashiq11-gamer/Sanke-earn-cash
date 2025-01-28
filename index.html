@@ -25,15 +25,21 @@
       border: 3px solid #fff;
       background: #111;
       display: block;
+      width: 90vw; /* Dynamically adjust size */
+      height: 90vw; /* Maintain square aspect ratio */
+      max-width: 400px;
+      max-height: 400px;
     }
-    #score, #earnings, .controls {
+    #score, #earnings {
       margin-top: 10px;
+      font-size: 1.2rem;
       text-align: center;
     }
     .controls {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
+      margin-top: 20px;
     }
     .button {
       width: 60px;
@@ -58,7 +64,7 @@
       background: #444;
       border: 2px solid #fff;
       color: white;
-      font-size: 18px;
+      font-size: 1rem;
       cursor: pointer;
     }
     #pause-btn:active, #withdraw-btn:active, #start-btn:active {
@@ -74,6 +80,7 @@
       background: rgba(0, 0, 0, 0.8);
       padding: 20px;
       border-radius: 10px;
+      width: 80%;
     }
     #game-over button {
       margin-top: 10px;
@@ -81,7 +88,7 @@
       background: #444;
       border: 2px solid #fff;
       color: white;
-      font-size: 18px;
+      font-size: 1rem;
       cursor: pointer;
     }
     #game-over button:active {
@@ -106,7 +113,7 @@
   </div>
   <button id="start-btn">Start Game</button>
   <button id="pause-btn">Pause</button>
-  <button id="withdraw-btn">Withdraw Money</button>
+  <button id="withdraw-btn">Withdraw</button>
   <div id="game-over">
     <h1>Game Over</h1>
     <div id="game-score"></div>
@@ -133,22 +140,15 @@
       right: document.getElementById("right"),
     };
 
-    const gridSize = 20; // Snake and food size
-    let snake = [{ x: 100, y: 100 }];
+    const gridSize = 20;
+    let snake = [{ x: gridSize * 5, y: gridSize * 5 }];
     let direction = { x: gridSize, y: 0 };
-    let food = { x: 200, y: 200 };
+    let food = { x: gridSize * 10, y: gridSize * 10 };
     let score = 0;
     let totalEarnings = 0;
     let isPaused = false;
+    let isGameStarted = false;
     let interval;
-
-    // Dynamically adjust canvas size
-    function adjustCanvasSize() {
-      canvas.width = Math.min(window.innerWidth - 20, 500);
-      canvas.height = Math.min(window.innerHeight - 200, 500);
-    }
-    adjustCanvasSize();
-    window.addEventListener("resize", adjustCanvasSize);
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -166,11 +166,10 @@
     }
 
     function moveSnake() {
-      if (isPaused) return;
+      if (isPaused || !isGameStarted) return;
 
       const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
 
-      // Check collisions
       if (
         head.x < 0 ||
         head.x >= canvas.width ||
@@ -184,10 +183,8 @@
 
       snake.unshift(head);
 
-      // Check if the snake eats the food
       if (head.x === food.x && head.y === food.y) {
         score++;
-        totalEarnings += 5;
         placeFood();
       } else {
         snake.pop();
@@ -199,27 +196,40 @@
     function placeFood() {
       food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
       food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
+
+      if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+        placeFood();
+      }
     }
 
     function endGame() {
       clearInterval(interval);
+      totalEarnings += score;
       gameOverScreen.style.display = "flex";
       gameScoreElement.textContent = `Your Score: ${score}`;
       gameEarningsElement.textContent = `Total Earnings: ${totalEarnings}$$`;
+      score = 0;
     }
 
     function restartGame() {
-      snake = [{ x: 100, y: 100 }];
+      snake = [{ x: gridSize * 5, y: gridSize * 5 }];
       direction = { x: gridSize, y: 0 };
       score = 0;
       isPaused = false;
+      isGameStarted = true;
       gameOverScreen.style.display = "none";
+      clearInterval(interval);
       interval = setInterval(moveSnake, 200);
       placeFood();
       draw();
     }
 
-    // Event listeners
+    function startGame() {
+      isGameStarted = true;
+      interval = setInterval(moveSnake, 200);
+      startBtn.style.display = "none";
+    }
+
     buttons.up.addEventListener("click", () => {
       if (direction.y === 0) direction = { x: 0, y: -gridSize };
     });
@@ -236,14 +246,19 @@
       isPaused = !isPaused;
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
+
     withdrawBtn.addEventListener("click", () => {
-      window.location.href = "withdraw.html"; // Opens withdraw.html
+      window.location.href = "withdraw.html";
     });
+
     restartBtn.addEventListener("click", restartGame);
-    startBtn.addEventListener("click", () => {
-      interval = setInterval(moveSnake, 200);
-      startBtn.style.display = "none";
-    });
+    startBtn.addEventListener("click", startGame);
+
+    canvas.width = Math.min(window.innerWidth * 0.9, 400);
+    canvas.height = canvas.width;
+
+    placeFood();
+    draw();
   </script>
 </body>
 </html>
