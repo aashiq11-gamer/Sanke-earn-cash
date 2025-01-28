@@ -46,18 +46,39 @@
 <body>
   <h1 id="method-title">Withdrawal Details</h1>
   <h2>Wallet Address</h2>
-  <input type="text" placeholder="Enter wallet address">
+  <input id="wallet-address" type="text" placeholder="Enter wallet address">
   <h2>Withdraw Amount</h2>
-  <input type="number" placeholder="Enter amount">
+  <input id="withdraw-amount" type="number" placeholder="Enter amount">
   <button onclick="submitRequest()">Submit</button>
 
   <script>
+    // Mock total earnings variable (to be dynamically passed from your game)
+    const totalEarnings = 12; // Replace this with the actual earnings from the game
+
     // Get withdrawal method from URL parameters
     const params = new URLSearchParams(window.location.search);
     const method = params.get('method');
     document.getElementById('method-title').textContent = `${method} Withdrawal Details`;
 
     function submitRequest() {
+      const withdrawAmount = parseFloat(document.getElementById('withdraw-amount').value);
+      const walletAddress = document.getElementById('wallet-address').value;
+
+      if (totalEarnings < 12) {
+        alert("Play, win 10$$ and then try again.");
+        return;
+      }
+
+      if (withdrawAmount <= 10 || isNaN(withdrawAmount)) {
+        alert("Withdraw amount must be greater than 10.");
+        return;
+      }
+
+      if (!walletAddress) {
+        alert("Please enter your wallet address.");
+        return;
+      }
+
       alert(`Congratulations! You have submitted your ${method} withdrawal request successfully. It will take a maximum of 24 working hours.`);
     }
   </script>
