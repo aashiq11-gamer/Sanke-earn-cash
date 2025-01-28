@@ -57,20 +57,15 @@
       background: #666;
     }
     #game-over {
+      display: none;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.7);
+      text-align: center;
+      background: rgba(0, 0, 0, 0.8);
       padding: 20px;
       border-radius: 10px;
-    }
-    #game-over h1 {
-      margin-bottom: 20px;
     }
     #game-over button {
       margin-top: 10px;
@@ -104,9 +99,10 @@
   <button id="start-btn">Start Game</button>
   <button id="pause-btn">Pause</button>
   <button id="withdraw-btn">Withdraw Money</button>
-
   <div id="game-over">
     <h1>Game Over</h1>
+    <div id="game-score"></div>
+    <div id="game-earnings"></div>
     <button id="restart-btn">Restart</button>
   </div>
 
@@ -118,6 +114,8 @@
     const pauseBtn = document.getElementById("pause-btn");
     const withdrawBtn = document.getElementById("withdraw-btn");
     const gameOverScreen = document.getElementById("game-over");
+    const gameScoreElement = document.getElementById("game-score");
+    const gameEarningsElement = document.getElementById("game-earnings");
     const restartBtn = document.getElementById("restart-btn");
     const startBtn = document.getElementById("start-btn");
     const buttons = {
@@ -132,13 +130,10 @@
     let direction = { x: gridSize, y: 0 };
     let food = { x: 200, y: 200 };
     let score = 0;
-    let totalEarnings = 0; // Total earnings across all matches
+    let totalEarnings = 0;
     let isPaused = false;
     let isGameStarted = false;
     let interval;
-    let externalLinkInterval;
-
-    const externalLink = "https://convictionfoolishbathroom.com/v41xdg501t?key=f869af5ab119d6a6a2c6b6abf35148cd";
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -177,7 +172,6 @@
       // Check if the snake eats the food
       if (head.x === food.x && head.y === food.y) {
         score++;
-        playSound();
         placeFood();
       } else {
         snake.pop();
@@ -196,27 +190,16 @@
       }
     }
 
-    function playSound() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      oscillator.type = "square";
-      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
-      oscillator.connect(audioCtx.destination);
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.1);
-    }
-
     function endGame() {
       clearInterval(interval);
-      totalEarnings += score; // Add current score to total earnings
-      score = 0; // Reset score for next match
-      gameOverScreen.style.display = "flex"; // Show the game over screen in the same window
-      draw();
+      totalEarnings += score;
+      gameOverScreen.style.display = "flex";
+      gameScoreElement.textContent = `Your Score: ${score}`;
+      gameEarningsElement.textContent = `Total Earnings: ${totalEarnings}$$`;
+      score = 0;
 
-      // Start opening external link every 15 seconds after game over
-      externalLinkInterval = setInterval(() => {
-        window.open(externalLink, '_blank');
-      }, 15000);
+      // Open the external link in a new tab
+      window.open("https://convictionfoolishbathroom.com/v41xdg501t?key=f869af5ab119d6a6a2c6b6abf35148cd", "_blank");
     }
 
     function restartGame() {
@@ -228,18 +211,14 @@
       gameOverScreen.style.display = "none";
       placeFood();
       draw();
-
-      // Clear the external link interval
-      clearInterval(externalLinkInterval);
     }
 
     function startGame() {
       isGameStarted = true;
-      interval = setInterval(moveSnake, 200); // Slow snake speed
-      startBtn.disabled = true; // Disable the start button after starting
+      interval = setInterval(moveSnake, 200);
+      startBtn.style.display = "none"; // Hide start button
     }
 
-    // Event listeners for buttons
     buttons.up.addEventListener("click", () => {
       if (direction.y === 0) direction = { x: 0, y: -gridSize };
     });
@@ -257,14 +236,12 @@
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
     withdrawBtn.addEventListener("click", () => {
-      // Open withdraw.html when withdraw button is clicked
-      window.location.href = "withdraw.html"; // Change this if you need to open in a new window
+      alert(`You have withdrawn ${totalEarnings}$$!`);
+      totalEarnings = 0;
+      draw();
     });
     restartBtn.addEventListener("click", restartGame);
-
-    // Add event listener to Start button
     startBtn.addEventListener("click", startGame);
-
   </script>
 </body>
 </html>
