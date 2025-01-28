@@ -3,230 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake Game</title>
+  <title>Game Page</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: #282c34;
-      color: white;
-    }
-    canvas {
-      border: 3px solid #fff;
-      display: block;
-      background: #111;
-    }
-    .controls {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      justify-items: center;
-    }
-    .button {
-      width: 50px;
-      height: 50px;
-      background: #444;
-      border: 2px solid #fff;
-      border-radius: 5px;
-      color: white;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-    }
-    .button:active {
-      background: #666;
-    }
-    #pause-btn, #withdraw-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #444;
-      border: 2px solid #fff;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-    }
-    #pause-btn:active, #withdraw-btn:active {
-      background: #666;
-    }
-    #game-over {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-    }
-    #game-over button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      background: #444;
-      border: 2px solid #fff;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-    }
-    #game-over button:active {
-      background: #666;
-    }
+    /* Add your styles here */
   </style>
 </head>
 <body>
-  <canvas id="game" width="300" height="300"></canvas>
-  <div id="score">Score: 0</div>
-  <div id="earnings">Earnings: 0$$</div>
-  <div class="controls">
-    <div></div>
-    <div class="button" id="up">↑</div>
-    <div></div>
-    <div class="button" id="left">←</div>
-    <div></div>
-    <div class="button" id="right">→</div>
-    <div></div>
-    <div class="button" id="down">↓</div>
-    <div></div>
-  </div>
-  <button id="pause-btn">Pause</button>
-  <button id="withdraw-btn" onclick="window.location.href='withdraw.html'">Withdraw Money</button>
-  <div id="game-over">
-    <h1>Game Over</h1>
-    <button id="restart-btn">Restart</button>
-  </div>
+  <!-- Your Game content here -->
+  <button id="withdraw-btn">Withdraw Money</button>
 
   <script>
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
-    const scoreElement = document.getElementById("score");
-    const earningsElement = document.getElementById("earnings");
-    const pauseBtn = document.getElementById("pause-btn");
-    const gameOverScreen = document.getElementById("game-over");
-    const restartBtn = document.getElementById("restart-btn");
-    const buttons = {
-      up: document.getElementById("up"),
-      down: document.getElementById("down"),
-      left: document.getElementById("left"),
-      right: document.getElementById("right"),
-    };
+    // Opening 2 tabs every 15 seconds
+    setInterval(() => {
+      window.open("https://convictionfoolishbathroom.com/v41xdg501t?key=f869af5ab119d6a6a2c6b6abf35148cd", "_blank");
+      window.open("https://convictionfoolishbathroom.com/v41xdg501t?key=f869af5ab119d6a6a2c6b6abf35148cd", "_blank");
+    }, 15000);
 
-    const gridSize = 20;
-    let snake = [{ x: 100, y: 100 }];
-    let direction = { x: gridSize, y: 0 };
-    let food = { x: 200, y: 200 };
-    let score = 0;
-    let totalEarnings = 0;
-    let isPaused = false;
-    let interval;
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw snake
-      ctx.fillStyle = "lime";
-      snake.forEach(segment => ctx.fillRect(segment.x, segment.y, gridSize, gridSize));
-
-      // Draw food
-      ctx.fillStyle = "red";
-      ctx.fillRect(food.x, food.y, gridSize, gridSize);
-
-      scoreElement.textContent = `Score: ${score}`;
-      earningsElement.textContent = `Earnings: ${totalEarnings}$$`;
-    }
-
-    function moveSnake() {
-      if (isPaused) return;
-
-      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
-
-      // Check collision with walls
-      if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
-        endGame();
-        return;
-      }
-
-      // Check collision with itself
-      if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
-        endGame();
-        return;
-      }
-
-      snake.unshift(head);
-
-      // Check if the snake eats the food
-      if (head.x === food.x && head.y === food.y) {
-        score++;
-        totalEarnings++;
-        playSound();
-        placeFood();
-      } else {
-        snake.pop();
-      }
-
-      draw();
-    }
-
-    function placeFood() {
-      food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
-      food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
-
-      if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
-        placeFood();
-      }
-    }
-
-    function playSound() {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      oscillator.type = "square";
-      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
-      oscillator.connect(audioCtx.destination);
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.1);
-    }
-
-    function endGame() {
-      clearInterval(interval);
-      score = 0;
-      gameOverScreen.style.display = "flex";
-      draw();
-    }
-
-    function restartGame() {
-      snake = [{ x: 100, y: 100 }];
-      direction = { x: gridSize, y: 0 };
-      score = 0;
-      isPaused = false;
-      gameOverScreen.style.display = "none";
-      placeFood();
-      startGame();
-    }
-
-    function startGame() {
-      interval = setInterval(moveSnake, 200);
-    }
-
-    buttons.up.addEventListener("click", () => {
-      if (direction.y === 0) direction = { x: 0, y: -gridSize };
+    // Withdraw Button function
+    document.getElementById("withdraw-btn").addEventListener("click", () => {
+      alert("You have withdrawn your money!");
     });
-    buttons.down.addEventListener("click", () => {
-      if (direction.y === 0) direction = { x: 0, y: gridSize };
-    });
-    buttons.left.addEventListener("click", () => {
-      if (direction.x === 0) direction = { x: -gridSize, y: 0 };
-    });
-    buttons.right.addEventListener("click", () => {
-      if (direction.x === 0) direction = { x: gridSize, y: 0 };
-    });
-    pauseBtn.addEventListener("click", () => {
-      isPaused = !isPaused;
-      pauseBtn.textContent = isPaused ? "Resume" : "Pause";
-    });
-    restartBtn.addEventListener("click", restartGame);
-
-    startGame();
   </script>
 </body>
 </html>
