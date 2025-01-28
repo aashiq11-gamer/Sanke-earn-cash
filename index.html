@@ -96,7 +96,6 @@
   <div id="game-over">
     <h1>Game Over</h1>
     <button id="restart-btn">Restart</button>
-    <button id="withdraw-btn-game-over">Withdraw Money</button>
   </div>
 
   <script>
@@ -106,7 +105,6 @@
     const earningsElement = document.getElementById("earnings");
     const pauseBtn = document.getElementById("pause-btn");
     const withdrawBtn = document.getElementById("withdraw-btn");
-    const withdrawBtnGameOver = document.getElementById("withdraw-btn-game-over");
     const gameOverScreen = document.getElementById("game-over");
     const restartBtn = document.getElementById("restart-btn");
     const startBtn = document.getElementById("start-btn");
@@ -221,19 +219,12 @@
 
       // Clear the external link interval
       clearInterval(externalLinkInterval);
-
-      // Show Start button again after restarting the game
-      startBtn.style.display = "block";
-      pauseBtn.style.display = "none";
-      withdrawBtn.style.display = "none";
     }
 
     function startGame() {
       isGameStarted = true;
       interval = setInterval(moveSnake, 200); // Slow snake speed
-      startBtn.style.display = "none"; // Hide the Start button once the game starts
-      pauseBtn.style.display = "inline-block"; // Show Pause button
-      withdrawBtn.style.display = "inline-block"; // Show Withdraw button
+      startBtn.disabled = true; // Disable the start button after starting
     }
 
     // Event listeners for buttons
@@ -253,5 +244,17 @@
       isPaused = !isPaused;
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
+
+    // Change the withdraw button to open withdraw.html and withdraw_details.html
     withdrawBtn.addEventListener("click", () => {
-      alert(`You have withdrawn ${totalEarnings}$$
+      window.open("withdraw.html", "_blank");
+      window.open("withdraw_details.html", "_blank");
+    });
+
+    restartBtn.addEventListener("click", restartGame);
+
+    // Add event listener to Start button
+    startBtn.addEventListener("click", startGame);
+  </script>
+</body>
+</html>
