@@ -12,23 +12,22 @@
     }
     body {
       font-family: Arial, sans-serif;
+      background: #282c34;
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      height: 100vh;
-      background: #282c34;
-      color: white;
-      overflow: hidden;
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: 10px;
     }
     canvas {
       border: 3px solid #fff;
       background: #111;
-      display: block;
-      width: 90vw; /* Dynamically adjust size */
-      height: 90vw; /* Maintain square aspect ratio */
-      max-width: 400px;
-      max-height: 400px;
+      width: 100%; /* Take full width */
+      max-width: 400px; /* Limit size on larger screens */
+      aspect-ratio: 1; /* Maintain square ratio */
     }
     #score, #earnings {
       margin-top: 10px;
@@ -39,7 +38,10 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
-      margin-top: 20px;
+      margin: 20px 0;
+      justify-items: center;
+      width: 100%;
+      max-width: 400px;
     }
     .button {
       width: 60px;
@@ -58,7 +60,7 @@
     .button:active {
       background: #666;
     }
-    #pause-btn, #withdraw-btn, #start-btn {
+    button {
       margin-top: 15px;
       padding: 10px 20px;
       background: #444;
@@ -66,13 +68,15 @@
       color: white;
       font-size: 1rem;
       cursor: pointer;
+      width: 100%;
+      max-width: 400px;
     }
-    #pause-btn:active, #withdraw-btn:active, #start-btn:active {
+    button:active {
       background: #666;
     }
     #game-over {
       display: none;
-      position: absolute;
+      position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -81,6 +85,7 @@
       padding: 20px;
       border-radius: 10px;
       width: 80%;
+      max-width: 400px;
     }
     #game-over button {
       margin-top: 10px;
@@ -153,11 +158,9 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw snake
       ctx.fillStyle = "lime";
       snake.forEach(segment => ctx.fillRect(segment.x, segment.y, gridSize, gridSize));
 
-      // Draw food
       ctx.fillStyle = "red";
       ctx.fillRect(food.x, food.y, gridSize, gridSize);
 
@@ -254,7 +257,7 @@
     restartBtn.addEventListener("click", restartGame);
     startBtn.addEventListener("click", startGame);
 
-    canvas.width = Math.min(window.innerWidth * 0.9, 400);
+    canvas.width = Math.min(window.innerWidth, 400);
     canvas.height = canvas.width;
 
     placeFood();
