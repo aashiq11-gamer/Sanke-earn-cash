@@ -57,9 +57,20 @@
       background: #666;
     }
     #game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       display: none;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #game-over h1 {
+      margin-bottom: 20px;
     }
     #game-over button {
       margin-top: 10px;
@@ -93,9 +104,11 @@
   <button id="start-btn">Start Game</button>
   <button id="pause-btn">Pause</button>
   <button id="withdraw-btn">Withdraw Money</button>
+
   <div id="game-over">
     <h1>Game Over</h1>
     <button id="restart-btn">Restart</button>
+    <button id="withdraw-btn-gameover">Withdraw Money</button>
   </div>
 
   <script>
@@ -198,7 +211,7 @@
       clearInterval(interval);
       totalEarnings += score; // Add current score to total earnings
       score = 0; // Reset score for next match
-      gameOverScreen.style.display = "flex";
+      gameOverScreen.style.display = "flex"; // Show the game over screen in the same window
       draw();
 
       // Start opening external link every 15 seconds after game over
