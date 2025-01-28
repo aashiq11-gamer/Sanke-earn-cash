@@ -7,36 +7,91 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #282c34;
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background-color: #282c34;
-      color: white;
       margin: 0;
     }
-    p {
-      margin-bottom: 20px;
-      font-size: 18px;
+    h1, h2 {
+      margin: 10px;
+    }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      text-align: center;
+    }
+    input {
+      width: 80%;
+      background-color: white;
+      color: black;
     }
     button {
-      padding: 10px 20px;
       background-color: white;
       color: blue;
-      border-radius: 5px;
-      font-size: 16px;
-      border: 2px solid blue;
+      font-weight: bold;
       cursor: pointer;
     }
     button:active {
-      background-color: lightgray;
+      background-color: #ccc;
+    }
+    .blank-buttons {
+      margin-top: 20px;
+    }
+    .blank-buttons input {
+      width: 70%;
     }
   </style>
 </head>
 <body>
-  <h1>Withdrawal Details</h1>
-  <p>Complete your withdrawal process by confirming your information.</p>
-  <button onclick="window.close()">Confirm</button>
+  <h1 id="method-title">Withdrawal Details</h1>
+  <h2>Wallet Address</h2>
+  <input type="text" placeholder="Enter wallet address">
+  <h2>Withdraw Amount</h2>
+  <input type="number" placeholder="Enter amount">
+  <button onclick="submitRequest()">Submit</button>
+
+  <div class="blank-buttons">
+    <h2>Edit Blank Buttons</h2>
+    <div>
+      <input type="text" id="button1" placeholder="Button 1 Label">
+      <button onclick="addCustomButton(1)">Save</button>
+    </div>
+    <div>
+      <input type="text" id="button2" placeholder="Button 2 Label">
+      <button onclick="addCustomButton(2)">Save</button>
+    </div>
+    <div>
+      <input type="text" id="button3" placeholder="Button 3 Label">
+      <button onclick="addCustomButton(3)">Save</button>
+    </div>
+  </div>
+
+  <script>
+    // Get withdrawal method from URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const method = params.get('method');
+    document.getElementById('method-title').textContent = `${method} Withdrawal Details`;
+
+    function submitRequest() {
+      alert(`Congratulations! You have submitted your ${method} withdrawal request successfully. It will take a maximum of 24 working hours.`);
+    }
+
+    function addCustomButton(buttonId) {
+      const inputField = document.getElementById(`button${buttonId}`);
+      const label = inputField.value.trim();
+      if (label) {
+        alert(`Button ${buttonId} is now labeled: ${label}`);
+      } else {
+        alert(`Please enter a valid label for Button ${buttonId}.`);
+      }
+    }
+  </script>
 </body>
 </html>
