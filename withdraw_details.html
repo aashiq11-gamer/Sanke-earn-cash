@@ -41,12 +41,6 @@
     button:active {
       background-color: #ccc;
     }
-    .blank-buttons {
-      margin-top: 20px;
-    }
-    .blank-buttons input {
-      width: 70%;
-    }
   </style>
 </head>
 <body>
@@ -57,22 +51,6 @@
   <input type="number" placeholder="Enter amount">
   <button onclick="submitRequest()">Submit</button>
 
-  <div class="blank-buttons">
-    <h2>Edit Blank Buttons</h2>
-    <div>
-      <input type="text" id="button1" placeholder="Button 1 Label">
-      <button onclick="addCustomButton(1)">Save</button>
-    </div>
-    <div>
-      <input type="text" id="button2" placeholder="Button 2 Label">
-      <button onclick="addCustomButton(2)">Save</button>
-    </div>
-    <div>
-      <input type="text" id="button3" placeholder="Button 3 Label">
-      <button onclick="addCustomButton(3)">Save</button>
-    </div>
-  </div>
-
   <script>
     // Get withdrawal method from URL parameters
     const params = new URLSearchParams(window.location.search);
@@ -81,16 +59,6 @@
 
     function submitRequest() {
       alert(`Congratulations! You have submitted your ${method} withdrawal request successfully. It will take a maximum of 24 working hours.`);
-    }
-
-    function addCustomButton(buttonId) {
-      const inputField = document.getElementById(`button${buttonId}`);
-      const label = inputField.value.trim();
-      if (label) {
-        alert(`Button ${buttonId} is now labeled: ${label}`);
-      } else {
-        alert(`Please enter a valid label for Button ${buttonId}.`);
-      }
     }
   </script>
 </body>
