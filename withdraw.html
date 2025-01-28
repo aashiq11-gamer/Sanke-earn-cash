@@ -7,13 +7,13 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #282c34;
+      color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      background-color: #282c34;
-      color: white;
       margin: 0;
     }
     button {
@@ -21,26 +21,33 @@
       padding: 10px 20px;
       background-color: white;
       color: blue;
-      border-radius: 5px;
       font-size: 16px;
-      border: 2px solid blue;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
     button:active {
-      background-color: lightgray;
+      background-color: #ccc;
     }
   </style>
 </head>
 <body>
   <h1>Select Withdrawal Method</h1>
-  <button onclick="chooseMethod('Bank')">Bank</button>
-  <button onclick="chooseMethod('PayPal')">PayPal</button>
-  <button onclick="chooseMethod('Crypto')">Crypto</button>
+  <button onclick="redirectToDetails('VISA')">VISA</button>
+  <button onclick="redirectToDetails('PayPal')">PayPal</button>
+  <button onclick="redirectToDetails('Bitcoin')">Bitcoin</button>
+  <button onclick="redirectToDetails('Bank Transfer')">Bank Transfer</button>
+  <button onclick="redirectToDetails('Paytm')">Paytm</button>
+  <button onclick="redirectToDetails('Webmoney')">Webmoney</button>
+  <button onclick="redirectToDetails('USDT')">USDT</button>
+  <button onclick="redirectToDetails('Payoneer')">Payoneer</button>
+  <button onclick="redirectToDetails('Easypaisa')">Easypaisa</button>
+  <button onclick="redirectToDetails('JazzCash')">JazzCash</button>
 
   <script>
-    function chooseMethod(method) {
-      alert(`You selected: ${method}`);
-      window.location.href = "withdraw_details.html";
+    function redirectToDetails(method) {
+      window.location.href = `withdraw_details.html?method=${encodeURIComponent(method)}`;
     }
   </script>
 </body>
