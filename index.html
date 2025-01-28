@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced Snake Game</title>
+  <title>Snake Game</title>
   <style>
     * {
       margin: 0;
@@ -25,17 +25,15 @@
       border: 3px solid #fff;
       background: #111;
       display: block;
-      max-width: 100%;
-      max-height: 100%;
     }
-    #score, #earnings, .controls, #leaderboard {
+    #score, #earnings, .controls {
       margin-top: 10px;
       text-align: center;
     }
     .controls {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 5px;
+      gap: 10px;
     }
     .button {
       width: 60px;
@@ -109,10 +107,6 @@
   <button id="start-btn">Start Game</button>
   <button id="pause-btn">Pause</button>
   <button id="withdraw-btn">Withdraw Money</button>
-  <div id="leaderboard">
-    <h3>Leaderboard</h3>
-    <ol id="leaderboard-list"></ol>
-  </div>
   <div id="game-over">
     <h1>Game Over</h1>
     <div id="game-score"></div>
@@ -132,7 +126,6 @@
     const gameEarningsElement = document.getElementById("game-earnings");
     const restartBtn = document.getElementById("restart-btn");
     const startBtn = document.getElementById("start-btn");
-    const leaderboardList = document.getElementById("leaderboard-list");
     const buttons = {
       up: document.getElementById("up"),
       down: document.getElementById("down"),
@@ -146,10 +139,10 @@
     let food = { x: 200, y: 200 };
     let score = 0;
     let totalEarnings = 0;
-    let interval;
     let isPaused = false;
+    let interval;
 
-    // Dynamically adjust canvas size to fit viewport
+    // Dynamically adjust canvas size
     function adjustCanvasSize() {
       canvas.width = Math.min(window.innerWidth - 20, 500);
       canvas.height = Math.min(window.innerHeight - 200, 500);
@@ -191,7 +184,7 @@
 
       snake.unshift(head);
 
-      // Eat food
+      // Check if the snake eats the food
       if (head.x === food.x && head.y === food.y) {
         score++;
         totalEarnings += 5;
@@ -244,7 +237,7 @@
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
     withdrawBtn.addEventListener("click", () => {
-      window.location.href = "withdraw.html"; // Redirect to withdraw.html
+      window.location.href = "withdraw.html"; // Opens withdraw.html
     });
     restartBtn.addEventListener("click", restartGame);
     startBtn.addEventListener("click", () => {
