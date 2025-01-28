@@ -5,32 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Advanced Snake Game</title>
   <style>
-    body {
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100vh;
       background: #282c34;
       color: white;
+      overflow: hidden;
     }
     canvas {
       border: 3px solid #fff;
-      display: block;
       background: #111;
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    #score, #earnings, .controls, #leaderboard {
+      margin-top: 10px;
+      text-align: center;
     }
     .controls {
-      margin-top: 20px;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      justify-items: center;
+      gap: 5px;
     }
     .button {
-      width: 50px;
-      height: 50px;
+      width: 60px;
+      height: 60px;
       background: #444;
       border: 2px solid #fff;
       border-radius: 5px;
@@ -40,12 +49,13 @@
       align-items: center;
       justify-content: center;
       user-select: none;
+      cursor: pointer;
     }
     .button:active {
       background: #666;
     }
     #pause-btn, #withdraw-btn, #start-btn {
-      margin-top: 20px;
+      margin-top: 15px;
       padding: 10px 20px;
       background: #444;
       border: 2px solid #fff;
@@ -55,26 +65,6 @@
     }
     #pause-btn:active, #withdraw-btn:active, #start-btn:active {
       background: #666;
-    }
-    #speed-menu {
-      margin-top: 20px;
-      display: none;
-      gap: 10px;
-    }
-    #speed-menu button {
-      background: #444;
-      border: 2px solid #fff;
-      color: white;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    #speed-menu button:active {
-      background: #666;
-    }
-    #leaderboard {
-      margin-top: 20px;
-      text-align: center;
     }
     #game-over {
       display: none;
@@ -102,13 +92,7 @@
   </style>
 </head>
 <body>
-  <button id="speed-btn">Select Speed</button>
-  <div id="speed-menu">
-    <button id="slow-btn">Slow</button>
-    <button id="normal-btn">Normal</button>
-    <button id="fast-btn">Fast</button>
-  </div>
-  <canvas id="game" width="300" height="300"></canvas>
+  <canvas id="game"></canvas>
   <div id="score">Score: 0</div>
   <div id="earnings">Earnings: 0$$</div>
   <div class="controls">
@@ -149,11 +133,6 @@
     const restartBtn = document.getElementById("restart-btn");
     const startBtn = document.getElementById("start-btn");
     const leaderboardList = document.getElementById("leaderboard-list");
-    const speedBtn = document.getElementById("speed-btn");
-    const speedMenu = document.getElementById("speed-menu");
-    const slowBtn = document.getElementById("slow-btn");
-    const normalBtn = document.getElementById("normal-btn");
-    const fastBtn = document.getElementById("fast-btn");
     const buttons = {
       up: document.getElementById("up"),
       down: document.getElementById("down"),
@@ -161,18 +140,22 @@
       right: document.getElementById("right"),
     };
 
-    const gridSize = 10;
-    let snake = [{ x: 150, y: 150 }];
+    const gridSize = 20; // Snake and food size
+    let snake = [{ x: 100, y: 100 }];
     let direction = { x: gridSize, y: 0 };
-    let food = { x: 180, y: 180 };
-    let specialFood = null;
+    let food = { x: 200, y: 200 };
     let score = 0;
     let totalEarnings = 0;
-    let speed = 200; // Default speed
-    let isPaused = false;
-    let isGameStarted = false;
     let interval;
-    let leaderboard = [];
+    let isPaused = false;
+
+    // Dynamically adjust canvas size to fit viewport
+    function adjustCanvasSize() {
+      canvas.width = Math.min(window.innerWidth - 20, 500);
+      canvas.height = Math.min(window.innerHeight - 200, 500);
+    }
+    adjustCanvasSize();
+    window.addEventListener("resize", adjustCanvasSize);
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -185,28 +168,23 @@
       ctx.fillStyle = "red";
       ctx.fillRect(food.x, food.y, gridSize, gridSize);
 
-      // Draw special food
-      if (specialFood) {
-        ctx.fillStyle = "gold";
-        ctx.fillRect(specialFood.x, specialFood.y, gridSize, gridSize);
-      }
-
       scoreElement.textContent = `Score: ${score}`;
       earningsElement.textContent = `Earnings: ${totalEarnings}$$`;
     }
 
     function moveSnake() {
-      if (isPaused || !isGameStarted) return;
+      if (isPaused) return;
 
       const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
 
-      // Collision detection
-      if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
-        endGame();
-        return;
-      }
-
-      if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+      // Check collisions
+      if (
+        head.x < 0 ||
+        head.x >= canvas.width ||
+        head.y < 0 ||
+        head.y >= canvas.height ||
+        snake.some(segment => segment.x === head.x && segment.y === head.y)
+      ) {
         endGame();
         return;
       }
@@ -216,11 +194,8 @@
       // Eat food
       if (head.x === food.x && head.y === food.y) {
         score++;
+        totalEarnings += 5;
         placeFood();
-        maybeSpawnSpecialFood();
-      } else if (specialFood && head.x === specialFood.x && head.y === specialFood.y) {
-        score += 5;
-        specialFood = null;
       } else {
         snake.pop();
       }
@@ -231,61 +206,27 @@
     function placeFood() {
       food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
       food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
-
-      // Ensure food doesn't spawn on the snake
-      if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
-        placeFood();
-      }
-    }
-
-    function maybeSpawnSpecialFood() {
-      if (Math.random() < 0.2) {
-        specialFood = {
-          x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
-          y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize,
-        };
-      }
     }
 
     function endGame() {
       clearInterval(interval);
-      leaderboard.push(score);
-      leaderboard.sort((a, b) => b - a);
-      leaderboard = leaderboard.slice(0, 3); // Keep top 3 scores
-      updateLeaderboard();
-      totalEarnings += score;
       gameOverScreen.style.display = "flex";
       gameScoreElement.textContent = `Your Score: ${score}`;
       gameEarningsElement.textContent = `Total Earnings: ${totalEarnings}$$`;
-      score = 0;
-    }
-
-    function updateLeaderboard() {
-      leaderboardList.innerHTML = leaderboard
-        .map((score, index) => `<li>${index + 1}. ${score}</li>`)
-        .join("");
     }
 
     function restartGame() {
-      snake = [{ x: 150, y: 150 }];
+      snake = [{ x: 100, y: 100 }];
       direction = { x: gridSize, y: 0 };
       score = 0;
       isPaused = false;
-      isGameStarted = true;
       gameOverScreen.style.display = "none";
-      clearInterval(interval);
-      interval = setInterval(moveSnake, speed);
+      interval = setInterval(moveSnake, 200);
       placeFood();
       draw();
     }
 
-    function startGame() {
-      isGameStarted = true;
-      interval = setInterval(moveSnake, speed);
-      startBtn.style.display = "none";
-    }
-
-    // Add event listeners
+    // Event listeners
     buttons.up.addEventListener("click", () => {
       if (direction.y === 0) direction = { x: 0, y: -gridSize };
     });
@@ -302,27 +243,13 @@
       isPaused = !isPaused;
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
-
+    withdrawBtn.addEventListener("click", () => {
+      window.location.href = "withdraw.html"; // Redirect to withdraw.html
+    });
     restartBtn.addEventListener("click", restartGame);
-    startBtn.addEventListener("click", startGame);
-
-    speedBtn.addEventListener("click", () => {
-      speedMenu.style.display = speedMenu.style.display === "none" ? "flex" : "none";
-    });
-
-    slowBtn.addEventListener("click", () => {
-      speed = 400;
-      restartGame();
-    });
-
-    normalBtn.addEventListener("click", () => {
-      speed = 300;
-      restartGame();
-    });
-
-    fastBtn.addEventListener("click", () => {
-      speed = 200;
-      restartGame();
+    startBtn.addEventListener("click", () => {
+      interval = setInterval(moveSnake, 200);
+      startBtn.style.display = "none";
     });
   </script>
 </body>
