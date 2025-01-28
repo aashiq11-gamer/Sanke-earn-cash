@@ -207,8 +207,10 @@
       direction = { x: gridSize, y: 0 };
       score = 0;
       isPaused = false;
-      isGameStarted = false;
+      isGameStarted = true; // Set the game to started
       gameOverScreen.style.display = "none";
+      clearInterval(interval); // Clear any previous interval
+      interval = setInterval(moveSnake, 200); // Restart the game loop
       placeFood();
       draw();
     }
