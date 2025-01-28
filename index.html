@@ -240,9 +240,8 @@
     });
 
     withdrawBtn.addEventListener("click", () => {
-      // Redirect to withdraw.html first, then withdraw_details.html
-      window.open("withdraw.html", "_blank");
-      window.open("withdraw_details.html", "_blank");
+      // Redirect to withdraw.html
+      window.location.href = "withdraw.html";
     });
 
     restartBtn.addEventListener("click", restartGame);
