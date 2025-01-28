@@ -96,6 +96,7 @@
   <div id="game-over">
     <h1>Game Over</h1>
     <button id="restart-btn">Restart</button>
+    <button id="withdraw-btn-game-over">Withdraw Money</button>
   </div>
 
   <script>
@@ -105,6 +106,7 @@
     const earningsElement = document.getElementById("earnings");
     const pauseBtn = document.getElementById("pause-btn");
     const withdrawBtn = document.getElementById("withdraw-btn");
+    const withdrawBtnGameOver = document.getElementById("withdraw-btn-game-over");
     const gameOverScreen = document.getElementById("game-over");
     const restartBtn = document.getElementById("restart-btn");
     const startBtn = document.getElementById("start-btn");
@@ -219,12 +221,19 @@
 
       // Clear the external link interval
       clearInterval(externalLinkInterval);
+
+      // Show Start button again after restarting the game
+      startBtn.style.display = "block";
+      pauseBtn.style.display = "block";
+      withdrawBtn.style.display = "block";
     }
 
     function startGame() {
       isGameStarted = true;
       interval = setInterval(moveSnake, 200); // Slow snake speed
-      startBtn.disabled = true; // Disable the start button after starting
+      startBtn.style.display = "none"; // Hide the Start button once the game starts
+      pauseBtn.style.display = "inline-block"; // Show Pause button
+      withdrawBtn.style.display = "inline-block"; // Show Withdraw button
     }
 
     // Event listeners for buttons
@@ -237,23 +246,4 @@
     buttons.left.addEventListener("click", () => {
       if (direction.x === 0) direction = { x: -gridSize, y: 0 };
     });
-    buttons.right.addEventListener("click", () => {
-      if (direction.x === 0) direction = { x: gridSize, y: 0 };
-    });
-    pauseBtn.addEventListener("click", () => {
-      isPaused = !isPaused;
-      pauseBtn.textContent = isPaused ? "Resume" : "Pause";
-    });
-    withdrawBtn.addEventListener("click", () => {
-      alert(`You have withdrawn ${totalEarnings}$$!`);
-      totalEarnings = 0; // Reset total earnings after withdrawal
-      draw();
-    });
-    restartBtn.addEventListener("click", restartGame);
-
-    // Add event listener to Start button
-    startBtn.addEventListener("click", startGame);
-
-  </script>
-</body>
-</html>
+    buttons.right.addEventListener("click", ()
