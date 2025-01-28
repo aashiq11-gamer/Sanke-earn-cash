@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake Game</title>
+  <title>Advanced Snake Game</title>
   <style>
     body {
       margin: 0;
@@ -56,6 +56,26 @@
     #pause-btn:active, #withdraw-btn:active, #start-btn:active {
       background: #666;
     }
+    #speed-menu {
+      margin-top: 20px;
+      display: none;
+      gap: 10px;
+    }
+    #speed-menu button {
+      background: #444;
+      border: 2px solid #fff;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #speed-menu button:active {
+      background: #666;
+    }
+    #leaderboard {
+      margin-top: 20px;
+      text-align: center;
+    }
     #game-over {
       display: none;
       position: absolute;
@@ -82,6 +102,12 @@
   </style>
 </head>
 <body>
+  <button id="speed-btn">Select Speed</button>
+  <div id="speed-menu">
+    <button id="slow-btn">Slow</button>
+    <button id="normal-btn">Normal</button>
+    <button id="fast-btn">Fast</button>
+  </div>
   <canvas id="game" width="300" height="300"></canvas>
   <div id="score">Score: 0</div>
   <div id="earnings">Earnings: 0$$</div>
@@ -99,6 +125,10 @@
   <button id="start-btn">Start Game</button>
   <button id="pause-btn">Pause</button>
   <button id="withdraw-btn">Withdraw Money</button>
+  <div id="leaderboard">
+    <h3>Leaderboard</h3>
+    <ol id="leaderboard-list"></ol>
+  </div>
   <div id="game-over">
     <h1>Game Over</h1>
     <div id="game-score"></div>
@@ -118,6 +148,12 @@
     const gameEarningsElement = document.getElementById("game-earnings");
     const restartBtn = document.getElementById("restart-btn");
     const startBtn = document.getElementById("start-btn");
+    const leaderboardList = document.getElementById("leaderboard-list");
+    const speedBtn = document.getElementById("speed-btn");
+    const speedMenu = document.getElementById("speed-menu");
+    const slowBtn = document.getElementById("slow-btn");
+    const normalBtn = document.getElementById("normal-btn");
+    const fastBtn = document.getElementById("fast-btn");
     const buttons = {
       up: document.getElementById("up"),
       down: document.getElementById("down"),
@@ -125,15 +161,18 @@
       right: document.getElementById("right"),
     };
 
-    const gridSize = 10; // Reduced size of the snake
+    const gridSize = 10;
     let snake = [{ x: 150, y: 150 }];
     let direction = { x: gridSize, y: 0 };
-    let food = { x: 180, y: 180 }; // Reduced size of the food
+    let food = { x: 180, y: 180 };
+    let specialFood = null;
     let score = 0;
     let totalEarnings = 0;
+    let speed = 200; // Default speed
     let isPaused = false;
     let isGameStarted = false;
     let interval;
+    let leaderboard = [];
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -146,6 +185,12 @@
       ctx.fillStyle = "red";
       ctx.fillRect(food.x, food.y, gridSize, gridSize);
 
+      // Draw special food
+      if (specialFood) {
+        ctx.fillStyle = "gold";
+        ctx.fillRect(specialFood.x, specialFood.y, gridSize, gridSize);
+      }
+
       scoreElement.textContent = `Score: ${score}`;
       earningsElement.textContent = `Earnings: ${totalEarnings}$$`;
     }
@@ -155,13 +200,12 @@
 
       const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
 
-      // Check collision with walls
+      // Collision detection
       if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
         endGame();
         return;
       }
 
-      // Check collision with itself
       if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
         endGame();
         return;
@@ -169,10 +213,14 @@
 
       snake.unshift(head);
 
-      // Check if the snake eats the food
+      // Eat food
       if (head.x === food.x && head.y === food.y) {
         score++;
         placeFood();
+        maybeSpawnSpecialFood();
+      } else if (specialFood && head.x === specialFood.x && head.y === specialFood.y) {
+        score += 5;
+        specialFood = null;
       } else {
         snake.pop();
       }
@@ -190,16 +238,32 @@
       }
     }
 
+    function maybeSpawnSpecialFood() {
+      if (Math.random() < 0.2) {
+        specialFood = {
+          x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
+          y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize,
+        };
+      }
+    }
+
     function endGame() {
       clearInterval(interval);
+      leaderboard.push(score);
+      leaderboard.sort((a, b) => b - a);
+      leaderboard = leaderboard.slice(0, 3); // Keep top 3 scores
+      updateLeaderboard();
       totalEarnings += score;
       gameOverScreen.style.display = "flex";
       gameScoreElement.textContent = `Your Score: ${score}`;
       gameEarningsElement.textContent = `Total Earnings: ${totalEarnings}$$`;
       score = 0;
+    }
 
-      // Open external link in a new tab
-      window.open("https://convictionfoolishbathroom.com/v41xdg501t?key=f869af5ab119d6a6a2c6b6abf35148cd", "_blank");
+    function updateLeaderboard() {
+      leaderboardList.innerHTML = leaderboard
+        .map((score, index) => `<li>${index + 1}. ${score}</li>`)
+        .join("");
     }
 
     function restartGame() {
@@ -210,14 +274,14 @@
       isGameStarted = true;
       gameOverScreen.style.display = "none";
       clearInterval(interval);
-      interval = setInterval(moveSnake, 200);
+      interval = setInterval(moveSnake, speed);
       placeFood();
       draw();
     }
 
     function startGame() {
       isGameStarted = true;
-      interval = setInterval(moveSnake, 200);
+      interval = setInterval(moveSnake, speed);
       startBtn.style.display = "none";
     }
 
@@ -239,13 +303,27 @@
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
 
-    withdrawBtn.addEventListener("click", () => {
-      // Redirect to withdraw.html
-      window.location.href = "withdraw.html";
-    });
-
     restartBtn.addEventListener("click", restartGame);
     startBtn.addEventListener("click", startGame);
+
+    speedBtn.addEventListener("click", () => {
+      speedMenu.style.display = speedMenu.style.display === "none" ? "flex" : "none";
+    });
+
+    slowBtn.addEventListener("click", () => {
+      speed = 400;
+      restartGame();
+    });
+
+    normalBtn.addEventListener("click", () => {
+      speed = 300;
+      restartGame();
+    });
+
+    fastBtn.addEventListener("click", () => {
+      speed = 200;
+      restartGame();
+    });
   </script>
 </body>
 </html>
