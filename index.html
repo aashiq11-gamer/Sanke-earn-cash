@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake Game</title>
+  <title>Snake Game with Special Food</title>
   <style>
+    /* Same styles as before */
     * {
       margin: 0;
       padding: 0;
@@ -25,9 +26,9 @@
     canvas {
       border: 3px solid #fff;
       background: #111;
-      width: 100%; /* Take full width */
-      max-width: 400px; /* Limit size on larger screens */
-      aspect-ratio: 1; /* Maintain square ratio */
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1;
     }
     #score, #earnings {
       margin-top: 10px;
@@ -149,20 +150,30 @@
     let snake = [{ x: gridSize * 5, y: gridSize * 5 }];
     let direction = { x: gridSize, y: 0 };
     let food = { x: gridSize * 10, y: gridSize * 10 };
+    let specialFood = null; // Special food position
     let score = 0;
     let totalEarnings = 0;
     let isPaused = false;
     let isGameStarted = false;
     let interval;
+    let specialFoodTimer;
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Draw snake
       ctx.fillStyle = "lime";
       snake.forEach(segment => ctx.fillRect(segment.x, segment.y, gridSize, gridSize));
 
+      // Draw normal food
       ctx.fillStyle = "red";
       ctx.fillRect(food.x, food.y, gridSize, gridSize);
+
+      // Draw special food if it exists
+      if (specialFood) {
+        ctx.fillStyle = "blue";
+        ctx.fillRect(specialFood.x, specialFood.y, gridSize, gridSize);
+      }
 
       scoreElement.textContent = `Score: ${score}`;
       earningsElement.textContent = `Earnings: ${totalEarnings}$$`;
@@ -186,9 +197,15 @@
 
       snake.unshift(head);
 
+      // Check if the snake eats the normal food
       if (head.x === food.x && head.y === food.y) {
         score++;
         placeFood();
+      } else if (specialFood && head.x === specialFood.x && head.y === specialFood.y) {
+        // Check if the snake eats the special food
+        score += 5; // Bonus points
+        specialFood = null; // Remove special food
+        clearTimeout(specialFoodTimer); // Clear timer
       } else {
         snake.pop();
       }
@@ -199,10 +216,30 @@
     function placeFood() {
       food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
       food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
+    }
 
-      if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
-        placeFood();
-      }
+    function placeSpecialFood() {
+      specialFood = {
+        x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
+        y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize,
+      };
+
+      // Remove special food after 5 seconds if not eaten
+      specialFoodTimer = setTimeout(() => {
+        specialFood = null;
+        draw();
+      }, 5000);
+    }
+
+    function startGame() {
+      isGameStarted = true;
+      interval = setInterval(moveSnake, 200);
+      startBtn.style.display = "none";
+
+      // Spawn special food every 15 seconds
+      setInterval(() => {
+        if (!specialFood) placeSpecialFood();
+      }, 15000);
     }
 
     function endGame() {
@@ -214,25 +251,7 @@
       score = 0;
     }
 
-    function restartGame() {
-      snake = [{ x: gridSize * 5, y: gridSize * 5 }];
-      direction = { x: gridSize, y: 0 };
-      score = 0;
-      isPaused = false;
-      isGameStarted = true;
-      gameOverScreen.style.display = "none";
-      clearInterval(interval);
-      interval = setInterval(moveSnake, 200);
-      placeFood();
-      draw();
-    }
-
-    function startGame() {
-      isGameStarted = true;
-      interval = setInterval(moveSnake, 200);
-      startBtn.style.display = "none";
-    }
-
+    // Add event listeners and setup game
     buttons.up.addEventListener("click", () => {
       if (direction.y === 0) direction = { x: 0, y: -gridSize };
     });
@@ -249,12 +268,10 @@
       isPaused = !isPaused;
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
-
     withdrawBtn.addEventListener("click", () => {
       window.location.href = "withdraw.html";
     });
-
-    restartBtn.addEventListener("click", restartGame);
+    restartBtn.addEventListener("click", () => location.reload());
     startBtn.addEventListener("click", startGame);
 
     canvas.width = Math.min(window.innerWidth, 400);
