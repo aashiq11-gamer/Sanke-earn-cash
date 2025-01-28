@@ -244,17 +244,15 @@
       isPaused = !isPaused;
       pauseBtn.textContent = isPaused ? "Resume" : "Pause";
     });
-
-    // Change the withdraw button to open withdraw.html and withdraw_details.html
     withdrawBtn.addEventListener("click", () => {
-      window.open("withdraw.html", "_blank");
-      window.open("withdraw_details.html", "_blank");
+      // Open withdraw.html when withdraw button is clicked
+      window.location.href = "withdraw.html"; // Change this if you need to open in a new window
     });
-
     restartBtn.addEventListener("click", restartGame);
 
     // Add event listener to Start button
     startBtn.addEventListener("click", startGame);
+
   </script>
 </body>
 </html>
