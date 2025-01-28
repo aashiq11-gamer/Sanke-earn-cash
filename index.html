@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Snake Game</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4488666684215653"
+    crossorigin="anonymous"></script>
   <style>
     body {
       margin: 0;
@@ -125,10 +127,10 @@
       right: document.getElementById("right"),
     };
 
-    const gridSize = 10; // Reduced size of the snake
+    const gridSize = 10;
     let snake = [{ x: 150, y: 150 }];
     let direction = { x: gridSize, y: 0 };
-    let food = { x: 180, y: 180 }; // Reduced size of the food
+    let food = { x: 180, y: 180 };
     let score = 0;
     let totalEarnings = 0;
     let isPaused = false;
@@ -138,11 +140,9 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw snake
       ctx.fillStyle = "lime";
       snake.forEach(segment => ctx.fillRect(segment.x, segment.y, gridSize, gridSize));
 
-      // Draw food
       ctx.fillStyle = "red";
       ctx.fillRect(food.x, food.y, gridSize, gridSize);
 
@@ -155,13 +155,11 @@
 
       const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
 
-      // Check collision with walls
       if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
         endGame();
         return;
       }
 
-      // Check collision with itself
       if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
         endGame();
         return;
@@ -169,7 +167,6 @@
 
       snake.unshift(head);
 
-      // Check if the snake eats the food
       if (head.x === food.x && head.y === food.y) {
         score++;
         placeFood();
@@ -184,7 +181,6 @@
       food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
       food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
 
-      // Ensure food doesn't spawn on the snake
       if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
         placeFood();
       }
@@ -198,7 +194,6 @@
       gameEarningsElement.textContent = `Total Earnings: ${totalEarnings}$$`;
       score = 0;
 
-      // Open external link in a new tab
       window.open("https://convictionfoolishbathroom.com/v41xdg501t?key=f869af5ab119d6a6a2c6b6abf35148cd", "_blank");
     }
 
@@ -221,7 +216,6 @@
       startBtn.style.display = "none";
     }
 
-    // Add event listeners
     buttons.up.addEventListener("click", () => {
       if (direction.y === 0) direction = { x: 0, y: -gridSize };
     });
@@ -240,7 +234,6 @@
     });
 
     withdrawBtn.addEventListener("click", () => {
-      // Redirect to withdraw.html
       window.location.href = "withdraw.html";
     });
 
